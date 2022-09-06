@@ -1,0 +1,19 @@
+version: '2'
+
+networks:
+  xl_app:
+
+services:
+  redis:
+    container_name: redis
+    image: redis:5.0.1
+    networks:
+      - xl_app
+    ports:
+      - 6379:6379
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - /tmp/redis:/data
+    command: "redis-server"
+

@@ -1,0 +1,111 @@
+version: '3.5'
+
+networks:
+  nwnet:
+
+volumes:
+  prometheus_data:
+  grafana:
+  grafana_etc:
+
+services:
+  prometheus:
+    image: prom/prometheus
+    #container_name: prometheus
+    hostname: prometheus
+    volumes:
+      - ./etc:/etc/prometheus
+      - ./prom/data:/prometheus
+      - /etc/localtime:/etc/localtime:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - nwnet
+    ports:
+      - '9090:9090'
+    user: root
+    restart: always
+
+  grafana:
+    hostname: grafana
+    image: grafana/grafana:6.7.3
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+    ports:
+      - "3000:3000"
+    volumes:
+      #- ./grafana.ini:/etc/grafana/grafana.ini
+      - ./graf/data:/var/lib/grafana
+      - ./graf/etc:/etc/grafana
+      #- ./datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+      #- ./dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
+      #- ./dashboard.json:/etc/grafana/dashboards/dashboard.json
+    networks:
+      - nwnet
+    user: root
+    restart: always
+
+  alertmanager:
+    image: prom/alertmanager
+    hostname: alertmanager
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./alert/etc/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ./alert/data:/alertmanager
+    ports:
+      - "9093:9093"
+    networks:
+      - nwnet
+    user: root
+    restart: always
+
+  #dingding:
+  #  image: timonwong/prometheus-webhook-dingtalk:latest
+  #  hostname: dingding
+  #  environment:
+  #    - TZ=Asia/Shanghai
+  #  volumes:
+  #    - /etc/localtime:/etc/localtime:ro
+  #    - ./alert/dingding/etc/config.yml:/etc/prometheus-webhook-dingtalk/config.yml
+  #    - ./alert/dingding/etc/default.tmpl:/etc/prometheus-webhook-dingtalk/templates/default.tmpl
+  #  #  - ./alert/dingding/etc/tmp.tmpl:/etc/prometheus-webhook-dingtalk/templates/tmp.tmpl
+  #  ports:
+  #    - 8060:8060
+  #  networks:
+  #    - nwnet
+  #  user: root
+  #  restart: always
+
+  pushgateway:
+    image: prom/pushgateway:latest
+    ports:
+      - "9091:9091"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - nwnet
+    user: root
+    restart: always
+  
+  consul:
+    image: consul:1.7.3
+    volumes:
+#      - ./conf:/consul/config
+      - ./consul_data:/consul/data
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "8400:8400"
+      - "8500:8500"
+      - "8600:8600/udp"
+    command: agent -server -client=0.0.0.0 -dev -log-level=info -node=xinyuan -bootstrap-expect=1 -data-dir=/consul/data 
+    user: root
+    networks:
+      - nwnet
+    restart: always

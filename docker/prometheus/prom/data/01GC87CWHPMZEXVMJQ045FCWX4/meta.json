@@ -1,0 +1,17 @@
+{
+	"ulid": "01GC87CWHPMZEXVMJQ045FCWX4",
+	"minTime": 1662417739191,
+	"maxTime": 1662422400000,
+	"stats": {
+		"numSamples": 10675,
+		"numSeries": 2152,
+		"numChunks": 2152
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01GC87CWHPMZEXVMJQ045FCWX4"
+		]
+	},
+	"version": 1
+}

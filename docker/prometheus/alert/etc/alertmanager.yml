@@ -1,0 +1,47 @@
+global:
+  #数据采集间隔
+  #scrape_interval: 15s
+  #评估告警周期
+  #evaluation_interval: 15s
+  resolve_timeout: 5m # 在没有报警的情况下声明为已解决的时间
+# # 这里的标签列表是接收到报警信息后的重新分组标签，例如，接收到的报警信息里面有许多具有 cluster=A 和 alertname=LatncyHigh 这样的标签的报警信息将会批量被聚合到一个分组里面
+route:
+  receiver: alertdeal
+  group_wait: 30s # 组告警等待时间。也就是告警产生后等待30s，如果有同组告警一起发出
+  group_interval: 1m # 两组告警的间隔时间
+  repeat_interval: 110h # 重复告警的间隔时间
+  group_by: ['alertname','host'] #采用哪个标签作为分组依据
+  routes:
+  - receiver: alertdeal
+    group_wait: 10s
+    # 只有匹配到标签为critical和warning的告警才走此路由通知alertdeal
+    match_re:
+      #severity: critical|warning
+      job: bsi
+
+# Inhibition rules allow to mute a set of alerts given that another alert is
+# # firing.
+# # We use this to mute any warning-level notifications if the same alert is
+# # already critical.
+inhibit_rules:
+- source_match:
+    severity: 'critical'
+  target_match:
+    severity: 'warning'
+  # Apply inhibition if the alertname is the same.
+  equal: ['alertname']
+
+# 如果触发InstanceDown的告警则抑制其他相关告警
+- source_match:
+    alertname: InstanceDown
+    severity: 'critical'
+  target_match:
+    severity: 'critical'
+  equal: ['alertname']
+
+
+receivers:
+- name: alertdeal
+  webhook_configs:
+  - url: 'http://172.16.5.60:8000/'
+    #send_resolved: true # 发送告警恢复的通知

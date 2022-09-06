@@ -1,0 +1,13 @@
+version: '3.5'
+
+networks:
+  nwnet:
+
+services:
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    ports:
+      - 9100:9100
+    networks:
+      - nwnet
+    restart: always

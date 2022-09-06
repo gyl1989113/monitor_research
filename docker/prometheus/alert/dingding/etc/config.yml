@@ -1,0 +1,8 @@
+targets:
+  webhook1:
+    #url: https://oapi.dingtalk.com/robot/send?access_token=8d99af3f01b645d8fb612dc37c1431401d82cb5eef7fc4a672da29230f6f5ce6 #运维监控群
+    #url: https://oapi.dingtalk.com/robot/send?access_token=645cab4cbf062f6d5cf30b290cb1161384dfa4f242216bddc2ab07da6538f8f9 #告警测试群
+    url: https://oapi.dingtalk.com/robot/send?access_token=645cab4cbf062f6d5cf30b290cb1161384dfa4f242216bddc2ab07da6538f8f9
+
+templates:
+  - /etc/prometheus-webhook-dingtalk/templates/default.tmpl

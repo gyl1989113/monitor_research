@@ -1,0 +1,97 @@
+groups:
+  - name: VMdisk
+    rules:
+    - alert: rootDiskFull
+      expr: sum by (location,host) (netdata_disk_space_GiB_average{chart="disk_space._",dimension="used", family="/", host!="node113", host!="node160"}) /sum by (location,host) (netdata_disk_space_GiB_average{chart="disk_space._",dimension=~"avail|used|reserved for root", family="/", host!="node113", host!="node160"}) > 0.6
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "位于{{ $labels.location }}的{{ $labels.host}}虚拟机硬盘:{{ $labels.family}}空间不足！"
+        description: "位于{{ $labels.location }}的{{ $labels.host}}虚拟机硬盘:{{ $labels.family}}空间使用超过60%!"
+    - alert: productionDiskFull
+      expr: sum by (location,host) (netdata_disk_space_GiB_average{chart="disk_space._var_production",dimension="used",family="/var/production"}) /sum by (location,host) (netdata_disk_space_GiB_average{chart="disk_space._var_production",dimension=~"avail|used|reserved for root", family="/var/production"}) > 0.6
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "位于{{ $labels.location }}的{{ $labels.host}}虚拟机硬盘:{{ $labels.family}}空间不足！"
+        description: "位于{{ $labels.location }}的{{ $labels.host}}虚拟机硬盘:{{ $labels.family}}空间使用超过60%!"
+    - alert: rootDiskFull_ali
+      expr: sum by (location,host) (netdata_disk_space_GiB_average{chart="disk_space._",dimension="used", family="/",location="aliyun0",host=~"node113|node160"}) /sum by (location,host) (netdata_disk_space_GiB_average{chart="disk_space._",dimension=~"avail|used|reserved for root", family="/", location="aliyun0", host=~"node113|node160"}) > 0.85
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "位于{{ $labels.location }}的{{ $labels.host}}虚拟机硬盘:{{ $labels.family}}空间不足！"
+        description: "位于{{ $labels.location }}的{{ $labels.host}}虚拟机硬盘:{{ $labels.family}}空间使用超过85%!"
+
+  - name: VMmemory
+    rules:
+    - alert: VM Memoryfull
+      expr: sum by(location,host)(netdata_system_ram_MiB_average{dimension="used"})/sum by(location,host)(netdata_system_ram_MiB_average{dimension=~"used|buffers|cached|free"}) > 0.8
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "位于{{ $labels.location }}的{{ $labels.host}}虚拟机内存不足,使用超过80%%！"
+        description: "位于{{ $labels.location }}的{{ $labels.host}}虚拟机内存不足,使用超过80%%"
+
+  - name: VMinstance
+    rules:
+    - alert: InstanceDown
+      expr: up == 0
+      for: 10m
+      labels:
+        severity: critical
+      annotations:
+        summary: "{{ $labels.instance }} 的监控服务异常超过10分钟"
+        description: "{{ $labels.instance }} 的监控服务异常超过10分钟"
+#  - name: VM-bsi
+#    rules:
+#    - alert: BSIDiskFull
+#      expr: (sum by (location,host)(netdata_disk_space_GiB_average{chart="disk_space._var_production", family="/var/production",host="bsi-platform",dimension="used"}))/(sum by (location,host)(netdata_disk_space_GiB_average{chart="disk_space._var_production", family="/var/production",host="bsi-platform",dimension=~"avail|used"})) > 0.5
+#      for: 5m
+#      labels:
+#        severity: critical
+#        type: bsi
+#      annotations:
+#        summary: "位于{{ $labels.location }}的{{ $labels.host}}虚拟机/var/production空间使用已经超过50%！ip为： {{$labels.host_ip}}"
+#        description: "位于{{ $labels.location }}的{{ $labels.host}}虚拟机/var/production空间使用已经超过50%！ip为： {{$labels.host_ip}}"
+
+  - name: ThinkSystem
+    rules:
+    - alert: Disk Exception
+      expr: max_over_time(disk_state [6h]) > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "服务器硬盘异常"
+        description: "服务器{{ $labels.ip }}的硬盘{{ $labels.id }}异常，状态为{{ $labels.health }}"
+    - alert: CPU Exception
+      expr: max_over_time(cpu_state [6h]) > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "服务器CPU异常"
+        description: "服务器{{ $labels.ip }}的CPU{{ $labels.id }}异常，状态为{{ $labels.health }}"
+    - alert: Memory Exception
+      expr: max_over_time(memory_state [6h]) > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "服务器内存异常"
+        description: "服务器{{ $labels.ip }}的内存{{ $labels.DeviceID }}异常，状态为{{ $labels.health }}"
+    - alert: log Exception
+      expr: max_over_time(log_state [6h]) > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "服务器日志异常"
+        description: "服务器{{ $labels.ip }}出现异常日志，异常级别:{{ $labels.Severity }}，日志信息为{{ $labels.message }}"
+
+

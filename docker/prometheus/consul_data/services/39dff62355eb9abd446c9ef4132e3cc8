@@ -1,0 +1,1 @@
+{"Token":"","Service":{"ID":"node-exporter","Service":"node-exporter-localhost","Tags":["test"],"Address":"localhost","Meta":null,"Port":9100,"Weights":{"Passing":1,"Warning":1},"EnableTagOverride":false,"Proxy":{"MeshGateway":{},"Expose":{}},"Connect":{},"CreateIndex":0,"ModifyIndex":0},"Source":"remote"}
