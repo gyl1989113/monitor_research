@@ -8,6 +8,14 @@ RUN go env -w GO111MODULE=on \
     && go mod tidy \
     && go build -o mysql_exporter .
 
+#linux image need this env
+# Build
+#ENV CGO_ENABLED=0
+#ENV GOOS=linux
+#ENV GOARCH=amd64
+#ENV GO111MODULE=on
+#ENV GOPROXY="https://goproxy.cn"
+
 # runtime
 FROM alpine:latest
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories &&\
