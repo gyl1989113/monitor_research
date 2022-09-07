@@ -85,7 +85,7 @@ def check_gpu_status():
                status.HTTP_500_INTERNAL_SERVER_ERROR
     gpu_info = stdout.splitlines()
     for info in gpu_info:
-        if not info.startwith('gpu'):
+        if not info.startswith('gpu'):
             bworker_utils.send_alarm_message(alarm_dict)
             return gpu_info[0], status.HTTP_200_OK
     return gpu_info[0], status.HTTP_200_OK
